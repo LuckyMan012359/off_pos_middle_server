@@ -10,7 +10,7 @@
   ],
   "private": true,
   "scripts": {
-    "dev": "nodemon ./src/app.js",
+    "start": "nodemon ./src/app.js",
     "watch": "nodemon  -e ts -w src -x npm run watch:serve",
     "watch:serve": "tsc && node dist/app.js",
     "build": "npm run clean && tsc",
