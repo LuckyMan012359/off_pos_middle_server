@@ -52,6 +52,7 @@ exports.addItemFromMain = async (req, res) => {
         name: data.name,
         alternative_name: data.alternative_name,
         type: data.type,
+        code: data.code,
         category_name: data.category_name,
         brand_name: data.brand_name,
         supplier_name: data.supplier_name,
@@ -143,6 +144,7 @@ exports.editItemFromMain = async (req, res) => {
         name: data.name,
         alternative_name: data.alternative_name,
         type: data.type,
+        code: data.code,
         category_name: data.category_name,
         brand_name: data.brand_name,
         supplier_name: data.supplier_name,
@@ -172,6 +174,57 @@ exports.editItemFromMain = async (req, res) => {
       );
 
       console.log(reqData);
+
+      console.log(response.data);
+    }
+
+    res.json({ status: 'Item edited successfully!' });
+  } catch (error) {
+    console.error('Error occurred:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.deleteItemFromMain = async (req, res) => {
+  try {
+    const data = req.body;
+
+    const opening_stocks = data.opening_stocks;
+
+    if (data.type === 'General_Product' || data.type === 'Installment_Product') {
+      opening_stocks.forEach((opening_stock) => {
+        const fetchData = async () => {
+          const outlet = opening_stock.outlet_data[0];
+
+          const reqData = {
+            code: data.code,
+            api_auth_key: outlet.token,
+          };
+
+          const response = await axios.post(
+            `http://${outlet.domain}/api/v1/ApiItemController/deleteItem`,
+            reqData,
+          );
+
+          console.log(response.data);
+        };
+
+        fetchData();
+      });
+    } else {
+      console.log(opening_stocks[0].outlet_data[0].domain);
+
+      const outlet = opening_stocks[0].outlet_data[0];
+
+      const reqData = {
+        code: data.code,
+        api_auth_key: outlet.token,
+      };
+
+      const response = await axios.post(
+        `http://${outlet.domain}/api/v1/ApiItemController/deleteItem`,
+        reqData,
+      );
 
       console.log(response.data);
     }
