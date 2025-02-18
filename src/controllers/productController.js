@@ -5,7 +5,7 @@ exports.addItemFromMain = async (req, res) => {
   try {
     const data = req.body;
 
-    console.log(JSON.stringify(data.opening_stock_data));
+    console.log(JSON.stringify(data));
 
     if (data.p_type === 'General_Product' || data.p_type === 'Installment_Product') {
       data.opening_stock_data.forEach(async (outlet) => {
@@ -46,7 +46,7 @@ exports.addItemFromMain = async (req, res) => {
         console.log(reqData);
         console.log(response.data);
       });
-    } else {
+    } else if (data.p_type !== 'Variation_Product' || data.p_type !== 'Combo_Product') {
       let reqData = {
         api_auth_key: data.opening_stock_data[0].api_key,
         name: data.name,
@@ -77,7 +77,7 @@ exports.addItemFromMain = async (req, res) => {
       };
 
       const response = await axios.post(
-        'http://localhost/sub_store/api/v1/ApiItemController/addItem',
+        `http://${data.opening_stock_data[0].domain}/api/v1/ApiItemController/addItem`,
         reqData,
       );
 
@@ -169,7 +169,7 @@ exports.editItemFromMain = async (req, res) => {
       };
 
       const response = await axios.post(
-        'http://localhost/sub_store/api/v1/ApiItemController/updateItem',
+        `http://${data.opening_stock_data[0].domain}/api/v1/ApiItemController/addItem`,
         reqData,
       );
 
