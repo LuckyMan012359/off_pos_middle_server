@@ -1,4 +1,7 @@
 const User = require('../models/Category');
+const FormData = require('form-data');
+const fs = require('fs');
+const path = require('path');
 const axios = require('axios');
 
 exports.addItemFromMain = async (req, res) => {
@@ -15,6 +18,7 @@ exports.addItemFromMain = async (req, res) => {
           alternative_name: data.alternative_name,
           type: data.type,
           code: data.code,
+          photo: data.photo,
           category_name: data.category_name,
           brand_name: data.brand_name,
           supplier_name: data.supplier_name,
@@ -45,6 +49,30 @@ exports.addItemFromMain = async (req, res) => {
 
         console.log(reqData);
         console.log(response.data);
+
+        console.log(data.photo);
+
+        if (data.photo) {
+          const form = new FormData();
+          const imagePath = path.join(__dirname, '..', 'uploads', data.photo);
+
+          console.log(imagePath);
+
+          if (fs.existsSync(imagePath)) {
+            const image = fs.createReadStream(imagePath);
+            form.append('photo', image, data.photo);
+
+            const imageResponse = await axios.post(
+              `http://${outlet.domain}/api/v1/ApiItemController/uploadImage`,
+              form,
+              { headers: form.getHeaders() },
+            );
+
+            console.log('Image upload response:', imageResponse.data);
+          } else {
+            throw new Error('Image file not found.');
+          }
+        }
       });
     } else if (data.p_type !== 'Variation_Product' || data.p_type !== 'Combo_Product') {
       let reqData = {
@@ -53,6 +81,7 @@ exports.addItemFromMain = async (req, res) => {
         alternative_name: data.alternative_name,
         type: data.type,
         code: data.code,
+        photo: data.photo,
         category_name: data.category_name,
         brand_name: data.brand_name,
         supplier_name: data.supplier_name,
@@ -84,6 +113,30 @@ exports.addItemFromMain = async (req, res) => {
       console.log(reqData);
 
       console.log(response.data);
+
+      console.log(data.photo);
+
+      if (data.photo) {
+        const form = new FormData();
+        const imagePath = path.join(__dirname, '..', 'uploads', data.photo);
+
+        console.log(imagePath);
+
+        if (fs.existsSync(imagePath)) {
+          const image = fs.createReadStream(imagePath);
+          form.append('photo', image, data.photo);
+
+          const imageResponse = await axios.post(
+            `http://${data.opening_stock_data[0].domain}/api/v1/ApiItemController/uploadImage`,
+            form,
+            { headers: form.getHeaders() },
+          );
+
+          console.log('Image upload response:', imageResponse.data);
+        } else {
+          throw new Error('Image file not found.');
+        }
+      }
     }
 
     res.json({ status: 'Item added successfully!' });
@@ -107,6 +160,7 @@ exports.editItemFromMain = async (req, res) => {
           alternative_name: data.alternative_name,
           type: data.type,
           code: data.code,
+          photo: data.photo,
           category_name: data.category_name,
           brand_name: data.brand_name,
           supplier_name: data.supplier_name,
@@ -137,14 +191,39 @@ exports.editItemFromMain = async (req, res) => {
 
         console.log(reqData);
         console.log(response.data);
+
+        console.log(data.photo);
+
+        if (data.photo) {
+          const form = new FormData();
+          const imagePath = path.join(__dirname, '..', 'uploads', data.photo);
+
+          console.log(imagePath);
+
+          if (fs.existsSync(imagePath)) {
+            const image = fs.createReadStream(imagePath);
+            form.append('photo', image, data.photo);
+
+            const imageResponse = await axios.post(
+              `http://${data.opening_stock_data[0].domain}/api/v1/ApiItemController/uploadImage`,
+              form,
+              { headers: form.getHeaders() },
+            );
+
+            console.log('Image upload response:', imageResponse.data);
+          } else {
+            throw new Error('Image file not found.');
+          }
+        }
       });
-    } else {
+    } else if (data.p_type !== 'Variation_Product' || data.p_type !== 'Combo_Product') {
       let reqData = {
         api_auth_key: data.opening_stock_data[0].api_key,
         name: data.name,
         alternative_name: data.alternative_name,
         type: data.type,
         code: data.code,
+        photo: data.photo,
         category_name: data.category_name,
         brand_name: data.brand_name,
         supplier_name: data.supplier_name,
@@ -176,6 +255,30 @@ exports.editItemFromMain = async (req, res) => {
       console.log(reqData);
 
       console.log(response.data);
+
+      console.log(data.photo);
+
+      if (data.photo) {
+        const form = new FormData();
+        const imagePath = path.join(__dirname, '..', 'uploads', data.photo);
+
+        console.log(imagePath);
+
+        if (fs.existsSync(imagePath)) {
+          const image = fs.createReadStream(imagePath);
+          form.append('photo', image, data.photo);
+
+          const imageResponse = await axios.post(
+            `http://${data.opening_stock_data[0].domain}/api/v1/ApiItemController/uploadImage`,
+            form,
+            { headers: form.getHeaders() },
+          );
+
+          console.log('Image upload response:', imageResponse.data);
+        } else {
+          throw new Error('Image file not found.');
+        }
+      }
     }
 
     res.json({ status: 'Item edited successfully!' });
