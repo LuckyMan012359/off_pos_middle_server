@@ -4,6 +4,7 @@ const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
 const productRoutes = require('./routes/productRoutes');
+const saleRoutes = require('./routes/saleRoutes');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -45,6 +46,7 @@ app.post('/upload', (req, res) => {
   });
 });
 app.use('/api/main/product', productRoutes);
+app.use('/api/main/sale', saleRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
