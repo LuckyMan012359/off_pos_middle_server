@@ -360,6 +360,8 @@ exports.deleteItemFromMain = async (req, res) => {
   try {
     const data = req.body;
 
+    console.log(data);
+
     const opening_stocks = data.opening_stocks;
 
     if (data.type === 'General_Product' || data.type === 'Installment_Product') {
@@ -383,24 +385,38 @@ exports.deleteItemFromMain = async (req, res) => {
         fetchData();
       });
     } else {
-      console.log(opening_stocks[0].outlet_data[0].domain);
+      console.log(opening_stocks);
 
-      const outlet = opening_stocks[0].outlet_data[0];
+      const groupedData = opening_stocks.reduce((acc, item) => {
+        if (!acc[item.api_key]) {
+          acc[item.outlet_id] = [];
+        }
+        acc[item.outlet_id].push(item);
+        return acc;
+      }, {});
 
-      const reqData = {
-        code: data.code,
-        api_auth_key: outlet.token,
-      };
+      const result = Object.values(groupedData);
 
-      const response = await axios.post(
-        `http://${outlet.domain}/api/v1/ApiItemController/deleteItem`,
-        reqData,
-      );
+      for (let element of result) {
+        console.log(element[0].outlet_data[0].domain);
 
-      console.log(response.data);
+        const outlet = element[0].outlet_data[0];
+
+        const reqData = {
+          code: data.code,
+          api_auth_key: outlet.token,
+        };
+
+        const response = await axios.post(
+          `http://${outlet.domain}/api/v1/ApiItemController/deleteItem`,
+          reqData,
+        );
+
+        console.log(response.data);
+      }
     }
 
-    res.json({ status: 'Item edited successfully!' });
+    res.json({ status: 'Item deleted successfully!' });
   } catch (error) {
     console.error('Error occurred:', error.message);
     res.status(500).json({ error: error.message });
