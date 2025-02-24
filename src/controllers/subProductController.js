@@ -7,10 +7,12 @@ exports.addItemFromSub = async (req, res) => {
   try {
     const data = req.body;
 
+    let response;
+
     console.log(data);
 
     if (data.p_type === 'General_Product' || data.p_type === 'Installment_Product') {
-      data.opening_stock_data.forEach(async (outlet) => {
+      for (let outlet of data.opening_stock_data) {
         let reqData = {
           api_auth_key: data.api_key,
           name: data.name,
@@ -42,7 +44,7 @@ exports.addItemFromSub = async (req, res) => {
           opening_stock: `[{'item_description':'','quantity':'${outlet.quantity}','outlet_name':'${outlet.outlet_name}'}]`,
         };
 
-        const response = await axios.post(
+        response = await axios.post(
           `http://localhost/off_pos/api/v1/ApiItemController/addItem`,
           reqData,
         );
@@ -73,7 +75,7 @@ exports.addItemFromSub = async (req, res) => {
             throw new Error('Image file not found.');
           }
         }
-      });
+      }
     } else if (data.p_type !== 'Variation_Product' || data.p_type !== 'Combo_Product') {
       let reqData = {
         api_auth_key: data.api_key,
@@ -106,7 +108,7 @@ exports.addItemFromSub = async (req, res) => {
         opening_stock: JSON.stringify(data.opening_stock_data),
       };
 
-      const response = await axios.post(
+      response = await axios.post(
         `http://localhost/off_pos/api/v1/ApiItemController/addItem`,
         reqData,
       );
@@ -140,7 +142,9 @@ exports.addItemFromSub = async (req, res) => {
       }
     }
 
-    res.json({ status: 'Item added successfully!' });
+    console.log(response.data);
+
+    res.json({ status: 'Item added successfully!', item_code: response.data.code });
   } catch (error) {
     console.error('Error occurred:', error.message);
     res.status(500).json({ error: error.message });
