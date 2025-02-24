@@ -151,8 +151,6 @@ exports.updateItemFromSub = async (req, res) => {
   try {
     const data = req.body;
 
-    console.log(data);
-
     if (data.p_type === 'General_Product' || data.p_type === 'Installment_Product') {
       data.opening_stock_data.forEach(async (outlet) => {
         let reqData = {
@@ -167,7 +165,7 @@ exports.updateItemFromSub = async (req, res) => {
           brand_name: data.brand_name,
           supplier_name: data.supplier_name,
           alert_quantity: data.alert_quantity,
-          unit_type: data.unit_type === '1' ? 'Single Unit' : 'Double Unit',
+          unit_type: Number(data.unit_type) === 1 ? 'Single Unit' : 'Double Unit',
           purchase_unit_name: data.purchase_unit_name,
           sale_unit_name: data.sale_unit_name,
           conversion_rate: data.conversion_rate,
@@ -190,6 +188,12 @@ exports.updateItemFromSub = async (req, res) => {
         const response = await axios.post(
           `http://localhost/off_pos/api/v1/ApiItemController/updateItem`,
           reqData,
+        );
+
+        console.log(
+          'unit type +>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',
+          data.unit_type,
+          Number(data.unit_type),
         );
 
         console.log(reqData);
@@ -232,7 +236,7 @@ exports.updateItemFromSub = async (req, res) => {
         brand_name: data.brand_name,
         supplier_name: data.supplier_name,
         alert_quantity: data.alert_quantity,
-        unit_type: data.unit_type === '1' ? 'Single Unit' : 'Double Unit',
+        unit_type: Number(data.unit_type) === 1 ? 'Single Unit' : 'Double Unit',
         purchase_unit_name: data.purchase_unit_name,
         sale_unit_name: data.sale_unit_name,
         conversion_rate: data.conversion_rate,
@@ -252,16 +256,14 @@ exports.updateItemFromSub = async (req, res) => {
         opening_stock: JSON.stringify(data.opening_stock_data),
       };
 
+      console.log('asdfasdfasdfasddf', reqData);
+
       const response = await axios.post(
         `http://localhost/off_pos/api/v1/ApiItemController/updateItem`,
         reqData,
       );
 
-      console.log(reqData);
-
       console.log(response.data);
-
-      console.log(data.photo);
 
       if (data.photo) {
         const form = new FormData();
