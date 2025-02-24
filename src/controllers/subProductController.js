@@ -156,7 +156,7 @@ exports.updateItemFromSub = async (req, res) => {
     const data = req.body;
 
     if (data.p_type === 'General_Product' || data.p_type === 'Installment_Product') {
-      data.opening_stock_data.forEach(async (outlet) => {
+      for (let outlet of data.opening_stock_data) {
         let reqData = {
           api_auth_key: data.api_key,
           outlet_name: outlet.outlet_name,
@@ -178,9 +178,9 @@ exports.updateItemFromSub = async (req, res) => {
           sale_price: data.sale_price,
           description: data.description,
           warranty: data.warranty,
-          warranty_type: data.warranty_date,
+          warranty_type: data.warranty_date ? data.warranty_date : data.warranty_type,
           guarantee: data.guarantee,
-          guarantee_type: data.guarantee_type,
+          guarantee_type: data.guarantee_type ? data.guarantee_type : data.guarantee_type,
           loyalty_point: data.loyalty_point,
           profit_margin: data.profit_margin,
           del_status: 'Live',
@@ -193,13 +193,6 @@ exports.updateItemFromSub = async (req, res) => {
           `http://localhost/off_pos/api/v1/ApiItemController/updateItem`,
           reqData,
         );
-
-        console.log(
-          'unit type +>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',
-          data.unit_type,
-          Number(data.unit_type),
-        );
-
         console.log(reqData);
         console.log(response.data);
 
@@ -226,7 +219,7 @@ exports.updateItemFromSub = async (req, res) => {
             throw new Error('Image file not found.');
           }
         }
-      });
+      }
     } else if (data.p_type !== 'Variation_Product' || data.p_type !== 'Combo_Product') {
       let reqData = {
         api_auth_key: data.api_key,

@@ -165,10 +165,20 @@ exports.editItemFromMain = async (req, res) => {
   try {
     const data = req.body;
 
-    console.log(req.body);
+    console.dir(data, { depth: 2 });
+
+    let outletIds = [];
+
+    data.preview_opening_stock_data.forEach((item) => {
+      if (!outletIds.includes(item.outlet_id)) {
+        outletIds.push(item.outlet_id);
+      }
+    });
 
     if (data.p_type === 'General_Product' || data.p_type === 'Installment_Product') {
-      data.opening_stock_data.forEach(async (outlet) => {
+      for (let outlet of data.opening_stock_data) {
+        console.log('outlet_data =->?>>>>>>>>>>>>>>>', outlet);
+
         let reqData = {
           api_auth_key: outlet.api_key,
           name: data.name,
@@ -189,9 +199,9 @@ exports.editItemFromMain = async (req, res) => {
           sale_price: data.sale_price,
           description: data.description,
           warranty: data.warranty,
-          warranty_type: data.warranty_date,
+          warranty_type: data.warranty_date ? data.warranty_date : data.warranty_type,
           guarantee: data.guarantee,
-          guarantee_type: data.guarantee_date,
+          guarantee_type: data.guarantee_date ? data.guarantee_date : data.guarantee_type,
           loyalty_point: data.loyalty_point,
           profit_margin: data.profit_margin,
           del_status: 'Live',
@@ -199,38 +209,42 @@ exports.editItemFromMain = async (req, res) => {
           opening_stock: `[{'item_description':'','quantity':'${outlet.quantity}','outlet_name':'${outlet.outlet_name}'}]`,
         };
 
-        const requestURL = `http://${outlet.domain}/api/v1/ApiItemController/updateItem`;
+        if (outlet.quantity !== '') {
+          const requestURL = `http://${outlet.domain}/api/v1/ApiItemController/updateItem`;
 
-        const response = await axios.post(requestURL, reqData);
+          const response = await axios.post(requestURL, reqData);
 
-        console.log(reqData);
-        console.log(response.data);
-        console.log('url ->>>>>>>>>>>>>>>>>>>>>>>>>>', requestURL);
+          console.log(reqData);
+          console.log(response.data);
+          console.log('url ->>>>>>>>>>>>>>>>>>>>>>>>>>', requestURL);
 
-        console.log(data.photo);
+          console.log(data.photo);
 
-        if (data.photo) {
-          const form = new FormData();
-          const imagePath = path.join(__dirname, '..', 'uploads', data.photo);
+          if (data.photo) {
+            const form = new FormData();
+            const imagePath = path.join(__dirname, '..', 'uploads', data.photo);
 
-          console.log(imagePath);
+            console.log(imagePath);
 
-          if (fs.existsSync(imagePath)) {
-            const image = fs.createReadStream(imagePath);
-            form.append('photo', image, data.photo);
+            if (fs.existsSync(imagePath)) {
+              const image = fs.createReadStream(imagePath);
+              form.append('photo', image, data.photo);
 
-            const imageResponse = await axios.post(
-              `http://${data.opening_stock_data[0].domain}/api/v1/ApiItemController/uploadImage`,
-              form,
-              { headers: form.getHeaders() },
-            );
+              const imageResponse = await axios.post(
+                `http://${data.opening_stock_data[0].domain}/api/v1/ApiItemController/uploadImage`,
+                form,
+                { headers: form.getHeaders() },
+              );
 
-            console.log('Image upload response:', imageResponse.data);
-          } else {
-            throw new Error('Image file not found.');
+              console.log('Image upload response:', imageResponse.data);
+            } else {
+              throw new Error('Image file not found.');
+            }
           }
+
+          outletIds = outletIds.filter((id) => id !== outlet.outlet_id);
         }
-      });
+      }
     } else if (data.p_type !== 'Variation_Product' || data.p_type !== 'Combo_Product') {
       const groupedData = data.opening_stock_data.reduce((acc, item) => {
         if (!acc[item.api_key]) {
@@ -244,7 +258,7 @@ exports.editItemFromMain = async (req, res) => {
 
       console.log(result);
 
-      result.forEach(async (element) => {
+      for (let element of result) {
         let reqData = {
           api_auth_key: element[0].api_key,
           name: data.name,
@@ -265,9 +279,9 @@ exports.editItemFromMain = async (req, res) => {
           sale_price: data.sale_price,
           description: data.description,
           warranty: data.warranty,
-          warranty_type: data.warranty_date,
+          warranty_type: data.warranty_date ? data.warranty_date : data.warranty_type,
           guarantee: data.guarantee,
-          guarantee_type: data.guarantee_type,
+          guarantee_type: data.guarantee_type ? data.guarantee_type : data.guarantee_date,
           loyalty_point: data.loyalty_point,
           profit_margin: data.profit_margin,
           del_status: 'Live',
@@ -304,7 +318,35 @@ exports.editItemFromMain = async (req, res) => {
             throw new Error('Image file not found.');
           }
         }
-      });
+
+        outletIds = outletIds.filter((id) => id !== element[0].outlet_id);
+      }
+    }
+
+    console.log(outletIds);
+
+    if (outletIds.length > 0) {
+      for (let outlet of outletIds) {
+        const outletData = data.preview_opening_stock_data.find(
+          (item) => item.outlet_id === outlet,
+        );
+
+        console.log(outletData);
+
+        const reqData = {
+          code: data.code,
+          api_auth_key: outletData.outlet_data[0].token,
+        };
+
+        const response = await axios.post(
+          `http://${outletData.outlet_data[0].domain}/api/v1/ApiItemController/deleteItem`,
+          reqData,
+        );
+
+        console.log(response.data);
+
+        console.log(outletData);
+      }
     }
 
     res.json({ status: 'Item edited successfully!' });
