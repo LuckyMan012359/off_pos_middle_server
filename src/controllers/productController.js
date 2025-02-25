@@ -1,4 +1,3 @@
-const User = require('../models/Category');
 const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
