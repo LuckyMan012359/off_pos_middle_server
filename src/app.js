@@ -6,6 +6,7 @@ require('dotenv').config();
 const productRoutes = require('./routes/productRoutes');
 const saleRoutes = require('./routes/saleRoutes');
 const subProductRoutes = require('./routes/subProductRoutes');
+const subSaleRoutes = require('./routes/subSaleRoutes');
 
 const bodyParser = require('body-parser');
 
@@ -50,6 +51,7 @@ app.post('/upload', (req, res) => {
 app.use('/api/main/product', productRoutes);
 app.use('/api/main/sale', saleRoutes);
 app.use('/api/sub/product', subProductRoutes);
+app.use('/api/sub/sale', subSaleRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

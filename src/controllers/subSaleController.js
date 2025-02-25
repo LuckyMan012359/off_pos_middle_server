@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-exports.addSaleFromMain = async (req, res) => {
+exports.addSaleFromSub = async (req, res) => {
   try {
     const data = req.body;
 
@@ -69,6 +69,7 @@ exports.addSaleFromMain = async (req, res) => {
 
     let reqData = {
       api_auth_key: data.api_auth_key,
+      domain: data.domain,
       customer_name: data.data.customer_name,
       employee_name: data.employee_name === 'Select Employee' ? '' : data.employee_name,
       total_items: orderData.total_items_in_cart,
@@ -104,19 +105,18 @@ exports.addSaleFromMain = async (req, res) => {
       outlet_name: data.outlet_name,
       items: JSON.stringify(items),
       payment_details: JSON.stringify(paymentDetail),
-      customer_info: data.customer_info,
     };
 
     const response = await axios.post(
-      `http://${data.domain}/api/v1/ApiSaleController/addSale`,
+      `http://localhost/off_pos/api/v1/ApiSaleController/addSale`,
       reqData,
     );
 
-    console.log(response.data);
+    console.log('response data ->>>>>>>>>>>>>>>>>>>>', response.data);
 
-    // console.dir(reqData, { depth: null });
+    console.dir(reqData, { depth: null });
 
-    // console.dir(data, { depth: null });
+    console.dir(data, { depth: null });
 
     res.status(200).json({ message: 'Success' });
   } catch (error) {
@@ -124,7 +124,7 @@ exports.addSaleFromMain = async (req, res) => {
   }
 };
 
-exports.updateSaleFromMain = async (req, res) => {
+exports.updateSaleFromSub = async (req, res) => {
   try {
     const data = req.body;
 
@@ -191,6 +191,7 @@ exports.updateSaleFromMain = async (req, res) => {
 
     let reqData = {
       api_auth_key: data.api_auth_key,
+      domain: data.domain,
       customer_name: data.data.customer_name,
       employee_name: data.employee_name === 'Select Employee' ? '' : data.employee_name,
       total_items: orderData.total_items_in_cart,
@@ -222,21 +223,21 @@ exports.updateSaleFromMain = async (req, res) => {
       note: data.data.note,
       order_date_time: data.order_date_time,
       sale_id: data.sale_id,
+      parent_id: data.parent_id,
       added_date: data.added_date,
       outlet_name: data.outlet_name,
       items: JSON.stringify(items),
       payment_details: JSON.stringify(paymentDetail),
-      customer_info: data.customer_info,
     };
 
     const response = await axios.post(
-      `http://${data.domain}/api/v1/ApiSaleController/updateSale`,
+      `http://localhost/off_pos/api/v1/ApiSaleController/updateSale`,
       reqData,
     );
 
     console.log(response.data);
 
-    // console.dir(reqData, { depth: null });
+    console.dir(reqData, { depth: null });
 
     // console.dir(data, { depth: null });
 
@@ -246,17 +247,18 @@ exports.updateSaleFromMain = async (req, res) => {
   }
 };
 
-exports.deleteSaleFromMain = async (req, res) => {
+exports.deleteSaleFromSub = async (req, res) => {
   try {
     console.log(req.body);
 
     const reqData = {
       random_code: req.body.random_code,
       api_auth_key: req.body.api_auth_key,
+      domain: req.body.domain,
     };
 
     const response = await axios.post(
-      `http://${req.body.domain}/api/v1/ApiSaleController/deleteSale`,
+      `http://localhost/off_pos/api/v1/ApiSaleController/deleteSale`,
       reqData,
     );
 
