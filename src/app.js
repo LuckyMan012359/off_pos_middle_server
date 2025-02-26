@@ -5,6 +5,7 @@ const cors = require('cors');
 require('dotenv').config();
 const productRoutes = require('./routes/productRoutes');
 const saleRoutes = require('./routes/saleRoutes');
+const purchaseRoutes = require('./routes/purchaseRoutes');
 const subProductRoutes = require('./routes/subProductRoutes');
 const subSaleRoutes = require('./routes/subSaleRoutes');
 
@@ -50,6 +51,7 @@ app.post('/upload', (req, res) => {
 });
 app.use('/api/main/product', productRoutes);
 app.use('/api/main/sale', saleRoutes);
+app.use('/api/main/purchase', purchaseRoutes);
 app.use('/api/sub/product', subProductRoutes);
 app.use('/api/sub/sale', subSaleRoutes);
 
