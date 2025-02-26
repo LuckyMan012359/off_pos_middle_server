@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 const cors = require('cors');
 require('dotenv').config();
 const productRoutes = require('./routes/productRoutes');
@@ -27,6 +28,31 @@ app.use((req, res, next) => {
   next();
 });
 
+const uploadDirectory = path.join(__dirname, 'uploads', 'attachments');
+if (!fs.existsSync(uploadDirectory)) {
+  fs.mkdirSync(uploadDirectory, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDirectory);
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+
+app.post('/upload-attachment', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded');
+  }
+
+  res.status(200).send({
+    message: 'File uploaded successfully',
+  });
+});
 app.post('/upload', (req, res) => {
   const { image, image_name } = req.body;
 

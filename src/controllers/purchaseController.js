@@ -16,6 +16,26 @@ exports.addPurchaseFromMain = async (req, res) => {
 
     console.log(response.data);
 
+    if (data.attachment) {
+      const form = new FormData();
+      const imagePath = path.join(__dirname, '..', 'uploads', 'attachments', data.attachment);
+
+      if (fs.existsSync(imagePath)) {
+        const image = fs.createReadStream(imagePath);
+        form.append('photo', image, data.photo);
+
+        const imageResponse = await axios.post(
+          `http://${data.outlet_info.domain}/api/v1/ApiPurchaseController/uploadAttachment`,
+          form,
+          { headers: form.getHeaders() },
+        );
+
+        console.log('Image upload response:', imageResponse.data);
+      } else {
+        throw new Error('Image file not found.');
+      }
+    }
+
     res.json({ status: 'Purchase added successfully!' });
   } catch (error) {
     console.error('Error occurred:', error.message);
@@ -35,6 +55,26 @@ exports.updatePurchaseFromMain = async (req, res) => {
     );
 
     console.log(response.data);
+
+    if (data.attachment) {
+      const form = new FormData();
+      const imagePath = path.join(__dirname, '..', 'uploads', 'attachments', data.attachment);
+
+      if (fs.existsSync(imagePath)) {
+        const image = fs.createReadStream(imagePath);
+        form.append('photo', image, data.photo);
+
+        const imageResponse = await axios.post(
+          `http://${data.outlet_info.domain}/api/v1/ApiPurchaseController/uploadAttachment`,
+          form,
+          { headers: form.getHeaders() },
+        );
+
+        console.log('Image upload response:', imageResponse.data);
+      } else {
+        throw new Error('Image file not found.');
+      }
+    }
 
     res.json({ status: 'Purchase updated successfully' });
   } catch (error) {
